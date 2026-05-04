@@ -102,7 +102,7 @@ function runSelfTest() {
       name: "query-docs",
       arguments: {
         query:
-          "Use this token sk-FAKE-REDACTED-EXAMPLE and private URL http://localhost:8080, secret=abc123.\n```js\nconst db = 'internal';\n```",
+          "Use this token REDACTED-OPENAI-KEY-EXAMPLE and private URL http://localhost:8080, secret=abc123.\n```js\nconst db = 'internal';\n```",
       },
     },
   };
