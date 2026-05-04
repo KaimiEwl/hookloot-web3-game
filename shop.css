@@ -1,0 +1,1308 @@
+/* Shop Overlay Wrapper */
+:root {
+    --shop-bg-top: #1A1816;
+    --shop-bg-bottom: #0F0E0D;
+    --shop-panel: rgba(26, 24, 22, 0.92);
+    --shop-accent: #F2D296;
+    --shop-accent-strong: #A5824C;
+    --shop-common: #2E8B57;
+    --shop-rare: #4682B4;
+    --shop-epic: #8A2BE2;
+    --shop-legendary: #F28A1F;
+    --shop-gold: #D4AF37;
+    --shop-danger: #C95F45;
+    --shop-card-width: 172px;
+    --shop-card-height: 248px;
+    --shop-card-shift: 110px;
+    --shop-card-shift-far: 188px;
+    --shop-card-depth: 70px;
+    --shop-card-depth-far: 130px;
+    --shop-card-center-scale: 1.04;
+    --shop-card-side-scale: 0.86;
+    --shop-card-far-scale: 0.68;
+}
+
+#shop-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #0F0E0D;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    perspective: 2000px;
+    font-family: "Unica One", sans-serif;
+    overflow: hidden;
+}
+
+#shop-overlay.active {
+    display: flex;
+}
+
+#shop-overlay,
+#shop-shell,
+#shopCarouselContainer {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#shop-overlay::-webkit-scrollbar,
+#shop-shell::-webkit-scrollbar,
+#shopCarouselContainer::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+html.shop-open,
+body.shop-open {
+    overflow: hidden !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html.shop-open::-webkit-scrollbar,
+body.shop-open::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+#shop-shell {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: radial-gradient(circle at center, var(--shop-bg-top) 0%, var(--shop-bg-bottom) 100%);
+    border-left: 1px solid #2D2924;
+    border-right: 1px solid #2D2924;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+    #shop-shell {
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+    }
+}
+
+/* PORTAL CSS */
+#portalContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    opacity: 1;
+    transform: scale(1);
+}
+
+#portalContainer.is-entering {
+    opacity: 0;
+    transform: scale(0.98);
+}
+
+#portalCard {
+    position: absolute;
+    width: 300px;
+    height: 350px;
+    background: rgba(18, 16, 14, 0.72);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(242, 210, 150, 0.75);
+    box-shadow: 0 0 30px rgba(242, 210, 150, 0.35), 0 0 50px rgba(165, 130, 76, 0.3),
+        inset 0 0 20px rgba(242, 210, 150, 0.18);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 2.2s cubic-bezier(0.1, 1, 0.1, 1);
+    z-index: 10;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    position: relative;
+    transform: scale(0.85);
+}
+
+#portalCard::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 19px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--shop-accent), var(--shop-accent-strong));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.9;
+    transition: opacity 1.5s ease;
+    z-index: 2;
+    box-shadow: 0 0 20px rgba(242, 210, 150, 0.7);
+}
+
+#portalCard::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(242, 210, 150, 0.16) 0%, rgba(165, 130, 76, 0.18) 100%);
+    opacity: 0.5;
+    z-index: 1;
+}
+
+.gooey-effect {
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    z-index: 0;
+    opacity: 0.9;
+    filter: blur(2px);
+}
+
+.gooey-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(12px);
+    animation: float-blob 15s infinite ease-in-out;
+    opacity: 0.9;
+}
+
+.gooey-blob:nth-child(1) {
+    width: 250px;
+    height: 250px;
+    left: -50px;
+    top: 100px;
+    background: radial-gradient(circle, rgba(242, 210, 150, 0.72) 0%, rgba(242, 210, 150, 0) 70%);
+    animation-duration: 8s;
+}
+
+.gooey-blob:nth-child(2) {
+    width: 200px;
+    height: 200px;
+    right: -30px;
+    top: 50px;
+    background: radial-gradient(circle, rgba(70, 130, 180, 0.62) 0%, rgba(70, 130, 180, 0) 70%);
+    animation-duration: 8s;
+    animation-delay: -3s;
+}
+
+.gooey-blob:nth-child(3) {
+    width: 180px;
+    height: 180px;
+    right: 50px;
+    bottom: 100px;
+    background: radial-gradient(circle, rgba(46, 139, 87, 0.58) 0%, rgba(46, 139, 87, 0) 70%);
+    animation-duration: 10s;
+    animation-delay: -4s;
+}
+
+.gooey-blob:nth-child(4) {
+    width: 220px;
+    height: 220px;
+    left: 30px;
+    bottom: 30px;
+    background: radial-gradient(circle, rgba(165, 130, 76, 0.6) 0%, rgba(165, 130, 76, 0) 70%);
+    animation-duration: 10s;
+    animation-delay: -4s;
+}
+
+@keyframes float-blob {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    20% {
+        transform: translate(30px, 20px) scale(1.05);
+    }
+
+    40% {
+        transform: translate(20px, 40px) scale(0.95);
+    }
+
+    60% {
+        transform: translate(-20px, 30px) scale(1.1);
+    }
+
+    80% {
+        transform: translate(-30px, -20px) scale(0.9);
+    }
+}
+
+#portalCard h1 {
+    color: white;
+    font-weight: 300;
+    font-size: 40px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.8s ease;
+    text-shadow: 0 0 15px rgba(242, 210, 150, 0.55);
+    position: relative;
+    z-index: 5;
+    line-height: 1;
+    text-align: center;
+}
+
+#portalButton {
+    padding: 16px 38px;
+    background: rgba(10, 12, 20, 0.3);
+    border: 2px solid var(--shop-accent);
+    border-radius: 50px;
+    color: white;
+    font-family: "Unica One", sans-serif;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 20;
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(242, 210, 150, 0.45);
+    text-shadow: 0 0 5px rgba(242, 210, 150, 0.45);
+}
+
+#portalButton::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(242, 210, 150, 0.26), rgba(165, 130, 76, 0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#portalButton:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(242, 210, 150, 0.65);
+    text-shadow: 0 0 10px rgba(242, 210, 150, 0.7);
+    border-color: var(--shop-accent-strong);
+}
+
+#portalButton:hover::before {
+    opacity: 1;
+}
+
+#portalBackBtn {
+    padding: 16px 38px;
+    background: rgba(10, 12, 20, 0.4);
+    border: 2px solid rgba(242, 210, 150, 0.35);
+    border-radius: 50px;
+    color: white;
+    font-family: "Unica One", sans-serif;
+    font-weight: 400;
+    font-size: 22px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 20;
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+}
+
+#portalBackBtn:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(242, 210, 150, 0.8);
+    box-shadow: 0 0 10px rgba(242, 210, 150, 0.45);
+}
+
+#tunnelCanvas {
+    position: absolute;
+    top: -1%;
+    left: -1%;
+    width: 102%;
+    height: 102%;
+}
+
+/* Magic Tubes Cursor */
+#tubes-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    /* Live cursor effect canvas. Interactive layers are stacked above it. */
+    opacity: 0;
+    /* Slight transparency so NFTs pop more */
+    mix-blend-mode: screen;
+    display: none;
+}
+
+#portalContent {
+    transition: all 1.1s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+#tunnelContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+    transform-style: preserve-3d;
+    transition: all 0s;
+}
+
+#tunnelContainer.active {
+    pointer-events: all;
+    z-index: 15;
+}
+
+#portalCard.zoomIn {
+    transform: translateZ(500px) scale(6);
+    opacity: 0;
+    transition: transform 1.1s ease-out, opacity 0.9s ease-in;
+}
+
+#portalCard.zoomIn::before,
+#portalCard.zoomIn::after {
+    opacity: 0;
+}
+
+#portalCard.zoomIn #portalContent {
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.card-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* CAROUSEL CSS */
+#shopCarouselContainer {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.18s ease-in;
+    background: transparent;
+    padding: 96px 10px 122px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    touch-action: pan-y;
+    overscroll-behavior: none;
+}
+
+#shopCarouselContainer> :not(#tubes-canvas):not(#shopConfirmModal) {
+    z-index: 3;
+}
+
+.shop-title {
+    font-size: 2.1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    white-space: nowrap;
+    font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+    background: linear-gradient(to bottom,
+            rgba(242, 210, 150, 0.42) 30%,
+            rgba(255, 255, 255, 0) 76%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.shop-topbar {
+    position: absolute;
+    top: 42px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(94%, 440px);
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) auto;
+    gap: 8px;
+    align-items: stretch;
+    z-index: 26;
+}
+
+.shop-balance-container {
+    position: relative;
+    top: auto;
+    left: auto;
+    background: rgba(26, 24, 22, 0.75);
+    border: 1px solid var(--shop-accent-strong);
+    padding: 8px 12px;
+    border-radius: 14px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 25;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+    transform: none;
+}
+
+.shop-balance-label {
+    font-size: 10px;
+    color: var(--shop-accent);
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.shop-balance-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+}
+
+.close-shop-btn {
+    background: rgba(26, 24, 22, 0.78);
+    border: 1px solid rgba(242, 210, 150, 0.35);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.25s;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.close-shop-btn:hover {
+    background: rgba(201, 95, 69, 0.35);
+    border-color: var(--shop-danger);
+}
+
+.carousel-container {
+    width: 100%;
+    max-width: 100%;
+    height: 290px;
+    position: relative;
+    perspective: 1000px;
+    margin-top: 4px;
+    touch-action: pan-y;
+}
+
+.carousel-track {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.24s ease-out;
+    will-change: transform;
+}
+
+.card {
+    position: absolute;
+    width: var(--shop-card-width);
+    height: var(--shop-card-height);
+    background: #1A1816;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    transition: transform 0.24s ease-out, opacity 0.24s ease-out, box-shadow 0.24s ease-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid transparent;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.card .nft-box {
+    width: 72%;
+    height: 72%;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.card .nft-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 1;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.nft-poster-fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.nft-poster-fallback.hidden {
+    opacity: 0;
+}
+
+/* Sub-classes for rarity colors generated by JS */
+
+.card.center {
+    z-index: 10;
+    transform: scale(var(--shop-card-center-scale)) translateZ(0);
+}
+
+.card.center .nft-box {
+    filter: none;
+}
+
+.card.left-1 {
+    z-index: 5;
+    transform: translateX(calc(-1 * var(--shop-card-shift))) scale(var(--shop-card-side-scale)) translateZ(calc(-1 * var(--shop-card-depth)));
+    opacity: 0.9;
+}
+
+.card.left-1 .nft-box {
+    filter: grayscale(100%);
+}
+
+.card.right-1 {
+    z-index: 5;
+    transform: translateX(var(--shop-card-shift)) scale(var(--shop-card-side-scale)) translateZ(calc(-1 * var(--shop-card-depth)));
+    opacity: 0.9;
+}
+
+.card.right-1 .nft-box {
+    filter: grayscale(100%);
+}
+
+.card.left-2 {
+    z-index: 2;
+    transform: translateX(calc(-1 * var(--shop-card-shift-far))) scale(var(--shop-card-far-scale)) translateZ(calc(-1 * var(--shop-card-depth-far)));
+    opacity: 0.62;
+}
+
+.card.right-2 {
+    z-index: 2;
+    transform: translateX(var(--shop-card-shift-far)) scale(var(--shop-card-far-scale)) translateZ(calc(-1 * var(--shop-card-depth-far)));
+    opacity: 0.62;
+}
+
+.card.left-2 .nft-box,
+.card.right-2 .nft-box {
+    filter: grayscale(100%);
+}
+
+@media (max-width: 768px) {
+    .card.left-1 .nft-box,
+    .card.right-1 .nft-box,
+    .card.left-2 .nft-box,
+    .card.right-2 .nft-box {
+        filter: none;
+        opacity: 0.82;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --shop-card-shift: 96px;
+        --shop-card-shift-far: 152px;
+        --shop-card-far-scale: 0.64;
+        --shop-card-depth-far: 105px;
+    }
+}
+
+.card.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.nft-info {
+    text-align: center;
+    margin-top: 14px;
+    padding: 0 10px;
+    transition: all 0.2s ease-out;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: auto;
+}
+
+.nft-name {
+    color: var(--shop-accent);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+}
+
+.nft-name::before,
+.nft-name::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    width: 48px;
+    height: 2px;
+    background: var(--shop-accent-strong);
+}
+
+.nft-name::before {
+    left: -58px;
+}
+
+.nft-name::after {
+    right: -58px;
+}
+
+.nft-role {
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    opacity: 0.8;
+    margin-top: 0;
+    padding: 8px 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.shop-boost-value {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.shop-boost-unit {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+}
+
+.shop-buy-btn {
+    margin-top: 20px;
+    background: rgba(242, 210, 150, 0.15);
+    border: 2px solid var(--shop-accent);
+    color: white;
+    padding: 10px 22px;
+    font-size: 15px;
+    width: min(90vw, 320px);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    text-transform: uppercase;
+    pointer-events: auto;
+    /* Buttons still need clicks */
+}
+
+.shop-buy-btn:hover:not(:disabled) {
+    background: var(--shop-accent);
+    color: black;
+    box-shadow: 0 0 20px rgba(242, 210, 150, 0.6);
+}
+
+.shop-buy-btn:disabled {
+    opacity: 0.5;
+    border-color: gray;
+    color: gray;
+    background: transparent;
+    cursor: not-allowed;
+}
+
+.dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+
+.dot.active {
+    background: var(--shop-accent-strong);
+    transform: scale(1.2);
+}
+
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(242, 210, 150, 0.16);
+    color: white;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    border: 1px solid var(--shop-accent-strong);
+    outline: none;
+    padding-bottom: 4px;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.nav-arrow:hover {
+    background: var(--shop-accent);
+    color: black;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.nav-arrow.left {
+    left: 8px;
+    padding-right: 3px;
+}
+
+.nav-arrow.right {
+    right: 8px;
+    padding-left: 3px;
+}
+
+.header-shop-btn {
+    background: linear-gradient(135deg, var(--shop-accent), var(--shop-accent-strong));
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #1A1816;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(242, 210, 150, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.header-shop-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(242, 210, 150, 0.45);
+}
+
+#congrats-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    color: white;
+}
+
+#congrats-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#congrats-overlay h1 {
+    font-size: 48px;
+    color: var(--shop-accent);
+    text-shadow: 0 0 20px rgba(242, 210, 150, 0.7);
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+}
+
+#congrats-overlay p {
+    font-size: 24px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+}
+
+#congrats-item-name {
+    font-weight: bold;
+    color: var(--shop-accent);
+}
+
+/* Shop Purchase Confirmation Modal */
+.shop-confirm-modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 14, 13, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+}
+
+.shop-confirm-modal.active {
+    display: flex !important;
+    opacity: 1;
+}
+
+.shop-confirm-content {
+    background: linear-gradient(145deg, rgba(34, 30, 26, 0.95), rgba(15, 14, 13, 0.95));
+    border: 2px solid var(--shop-accent-strong);
+    border-radius: 20px;
+    padding: 30px 40px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(242, 210, 150, 0.2);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: 400px;
+    width: 90%;
+}
+
+.shop-confirm-modal.active .shop-confirm-content {
+    transform: scale(1);
+}
+
+#shopConfirmTitle {
+    color: #fff;
+    font-size: 1.8rem;
+    margin: 0 0 10px 0;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#shopConfirmPrice {
+    color: var(--shop-accent);
+    font-size: 1.4rem;
+    margin: 0 0 25px 0;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(242, 210, 150, 0.45);
+}
+
+.shop-confirm-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.shop-btn-yes,
+.shop-btn-no {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    font-family: inherit;
+    border: none;
+}
+
+.shop-btn-yes {
+    background: rgba(242, 210, 150, 0.14);
+    border: 2px solid var(--shop-accent);
+    color: #fff;
+}
+
+.shop-btn-yes:hover {
+    background: var(--shop-accent);
+    color: #000;
+    box-shadow: 0 0 15px rgba(242, 210, 150, 0.55);
+}
+
+.shop-btn-no {
+    background: rgba(201, 95, 69, 0.12);
+    border: 2px solid var(--shop-danger);
+    color: #fff;
+}
+
+.shop-btn-no:hover {
+    background: var(--shop-danger);
+    color: #000;
+    box-shadow: 0 0 15px rgba(201, 95, 69, 0.55);
+}
+
+/* Navigation is swipe-first on mobile and desktop touch devices. */
+.nav-arrow,
+.nav-arrow.left,
+.nav-arrow.right {
+    display: none !important;
+}
+
+@media (max-height: 760px) {
+    .carousel-container {
+        height: 255px;
+    }
+
+    .nft-info {
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 380px) {
+    :root {
+        --shop-card-width: 154px;
+        --shop-card-height: 224px;
+        --shop-card-shift: 96px;
+        --shop-card-shift-far: 142px;
+        --shop-card-depth: 60px;
+        --shop-card-depth-far: 96px;
+        --shop-card-far-scale: 0.6;
+    }
+
+    .shop-title {
+        font-size: 1.7rem;
+    }
+
+    .shop-topbar {
+        width: calc(100% - 10px);
+        gap: 6px;
+        grid-template-columns: minmax(95px, 1fr) auto;
+    }
+
+    .close-shop-btn {
+        padding: 8px 9px;
+        font-size: 11px;
+    }
+
+    .shop-buy-btn {
+        font-size: 14px;
+        width: 92%;
+    }
+
+}
+
+/* Tab-mode overrides: shop is a regular app screen (no overlay enter/tunnel). */
+#screenShop {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#screenShop.is-active {
+    display: flex;
+    flex-direction: column;
+}
+
+#screenShop.hidden,
+.app-screen.hidden#screenShop {
+    display: none !important;
+}
+
+#screenShop #shopCarouselContainer {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+    flex: 1;
+    display: flex;
+    opacity: 1;
+    padding: 62px 8px 76px;
+    background: radial-gradient(circle at center, var(--shop-bg-top) 0%, var(--shop-bg-bottom) 100%);
+    overflow: hidden;
+}
+
+#screenShop #shopCarouselContainer > :not(#tubes-canvas):not(#shopConfirmModal) {
+    z-index: 3;
+}
+
+#screenShop .shop-topbar {
+    display: none !important;
+}
+
+#screenShop .shop-balance-container {
+    pointer-events: auto;
+}
+
+#screenShop #tubes-canvas {
+    display: none;
+}
+
+/* Shop readability + active-card framing */
+#screenShop,
+#screenShop #shopCarouselContainer {
+    font-family: "Manrope", "Inter", sans-serif;
+}
+
+#screenShop .shop-title {
+    color: rgba(242, 210, 150, 0.92);
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    text-shadow: 0 0 18px rgba(242, 210, 150, 0.24);
+    letter-spacing: 0.03em;
+}
+
+#screenShop .shop-balance-label {
+    color: rgba(242, 210, 150, 0.92);
+}
+
+#screenShop .shop-balance-value,
+#screenShop .nft-role {
+    color: #f5efe4;
+}
+
+#screenShop .nft-name {
+    font-family: "Manrope", "Inter", sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 14px rgba(242, 210, 150, 0.18);
+}
+
+#screenShop .card.center {
+    box-shadow: 0 0 0 1px rgba(242, 210, 150, 0.5), 0 22px 40px rgba(0, 0, 0, 0.56), 0 0 26px rgba(242, 210, 150, 0.2);
+}
+
+#screenShop .card.center .nft-box {
+    box-shadow: inset 0 0 0 1px rgba(242, 210, 150, 0.42), 0 0 20px rgba(242, 210, 150, 0.28);
+}
+
+#screenShop .card.left-1,
+#screenShop .card.right-1 {
+    opacity: 0.94;
+}
+
+/* Keep nav buttons visible and run tunnel intro only inside shop screen area. */
+#screenShop #shopCarouselContainer {
+    z-index: 6;
+}
+
+#screenShop #shopCarouselContainer.shop-content-hidden {
+    opacity: 0;
+    transform: scale(0.985);
+}
+
+.shop-tunnel-intro {
+    position: absolute;
+    inset: 0;
+    z-index: 18;
+    pointer-events: none;
+    opacity: 0;
+    background:
+        radial-gradient(circle at center, rgba(242, 210, 150, 0.08) 0%, rgba(15, 14, 13, 0.88) 58%, rgba(15, 14, 13, 1) 100%),
+        linear-gradient(180deg, #14120f 0%, #0f0e0d 100%);
+    transition: opacity 0.2s ease;
+    overflow: hidden;
+}
+
+.shop-tunnel-intro.hidden {
+    display: none;
+}
+
+.shop-tunnel-intro.active {
+    display: block;
+    opacity: 1;
+}
+
+.shop-tunnel-vignette {
+    position: absolute;
+    inset: -12%;
+    background: radial-gradient(circle at center, transparent 18%, rgba(15, 14, 13, 0.75) 56%, rgba(15, 14, 13, 0.96) 100%);
+    transform: scale(1.15);
+    animation: shopTunnelZoom 0.96s ease-in forwards;
+}
+
+.shop-tunnel-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    border: 2px solid rgba(242, 210, 150, 0.7);
+    box-shadow: 0 0 34px rgba(242, 210, 150, 0.4);
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+}
+
+.shop-tunnel-ring-1 {
+    width: 120px;
+    height: 120px;
+    animation: shopTunnelRing 0.96s ease-out forwards;
+}
+
+.shop-tunnel-ring-2 {
+    width: 180px;
+    height: 180px;
+    border-color: rgba(165, 130, 76, 0.5);
+    animation: shopTunnelRing 0.96s ease-out 0.08s forwards;
+}
+
+.shop-tunnel-ring-3 {
+    width: 240px;
+    height: 240px;
+    border-color: rgba(242, 210, 150, 0.34);
+    animation: shopTunnelRing 0.96s ease-out 0.16s forwards;
+}
+
+.shop-tunnel-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(242, 210, 150, 0.92) 0%, rgba(165, 130, 76, 0.08) 72%, transparent 100%);
+    box-shadow: 0 0 56px rgba(242, 210, 150, 0.72);
+    animation: shopTunnelCore 0.96s ease-out forwards;
+}
+
+@keyframes shopTunnelRing {
+    0% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 0;
+    }
+    30% {
+        opacity: 0.92;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2.85);
+        opacity: 0;
+    }
+}
+
+@keyframes shopTunnelZoom {
+    0% {
+        transform: scale(1.22);
+        opacity: 0.95;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+@keyframes shopTunnelCore {
+    0% {
+        opacity: 0.95;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(3.1);
+    }
+}
+
+/* Light theme: readable shop screen */
+html:not(.dark) {
+    --shop-bg-top: #f8f4ec;
+    --shop-bg-bottom: #eee5d8;
+    --shop-panel: rgba(255, 255, 255, 0.92);
+}
+
+html:not(.dark) #screenShop #shopCarouselContainer {
+    background:
+        radial-gradient(circle at 24% -6%, rgba(242, 210, 150, 0.34), transparent 44%),
+        radial-gradient(circle at 84% 102%, rgba(165, 130, 76, 0.18), transparent 40%),
+        linear-gradient(180deg, #f8f4ec 0%, #eee5d8 100%);
+}
+
+html:not(.dark) #screenShop .shop-title {
+    color: #5e4628;
+    text-shadow: none;
+}
+
+html:not(.dark) #screenShop .nft-name {
+    color: #4a351c;
+    text-shadow: none;
+}
+
+html:not(.dark) #screenShop .nft-role {
+    color: #4d3d29;
+    opacity: 1;
+}
+
+html:not(.dark) #screenShop .card {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 18px 34px rgba(84, 62, 31, 0.14);
+}
+
+html:not(.dark) #screenShop .card .nft-box {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(238, 231, 218, 0.86) 100%);
+}
+
+html:not(.dark) #screenShop .shop-buy-btn {
+    color: #342513;
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(165, 130, 76, 0.72);
+}
+
+html:not(.dark) #screenShop .shop-buy-btn:hover:not(:disabled) {
+    color: #1f170d;
+    background: #f2d296;
+}
+
+html:not(.dark) #screenShop .dot {
+    background: rgba(75, 58, 34, 0.22);
+}
+
+html:not(.dark) #screenShop .dot.active {
+    background: #a5824c;
+}

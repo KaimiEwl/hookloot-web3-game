@@ -1,0 +1,34 @@
+Отлично — это именно то, что нужно. Архив полный: настройки Antigravity + правила + расширения + шаблон проекта + скрипты развёртывания.
+
+Где лежит архив
+
+C:\Video Test\AG_STARTER_PACK\AG_STARTER_PACK_20260216_1108.zip
+
+Как пользоваться на этом же ПК (новый проект за минуты)
+
+Распакуй zip куда угодно (например рядом).
+
+Создай новый проект из шаблона:
+
+.\backup\scripts\new_project_from_template.ps1 -TargetPath "C:\Video Test\MyNewApp"
+
+
+Открой C:\Video Test\MyNewApp в Antigravity и начинай давать задачи. (Он прочитает .agent/rules/PROJECT.md и HANDOFF.md.)
+
+Как пользоваться на новом устройстве (восстановить “как сейчас”)
+
+Поставь базовое из backup\docs\PREREQS.md (Antigravity, Git, Node и т.д.).
+
+Распакуй zip.
+
+Восстанови среду:
+
+.\backup\scripts\restore_antigravity.ps1
+
+
+Разверни новый проект:
+
+.\backup\scripts\new_project_from_template.ps1 -TargetPath "C:\Projects\MyNewApp"
+
+
+Если хочешь, следующий шаг — мы зададим “рабочий протокол”: ты даёшь задачу → он даёт ссылку preview → скрины до/после → scripts/test.ps1 → commit.

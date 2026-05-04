@@ -1,0 +1,29 @@
+[Unit]
+Description=NFT Miner TON payments monitor worker
+Documentation=file:/opt/portfolio-demo-app/docs/DEPLOY_CHECKLIST.md
+After=network-online.target postgresql.service redis-server.service nft-miner-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=nftminer
+Group=nftminer
+WorkingDirectory=/opt/portfolio-demo-app
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/nft-miner-api.env
+ExecStart=/usr/bin/npm run worker:payments
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+StandardOutput=journal
+StandardError=journal
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/portfolio-demo-app
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target

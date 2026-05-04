@@ -1,0 +1,17 @@
+# Optional logrotate example only if services are configured to write files.
+# Current recommended setup writes to journald and is viewed through journalctl.
+
+/var/log/nft-miner/*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 nftminer nftminer
+    sharedscripts
+    postrotate
+        systemctl kill -s HUP nft-miner-api.service >/dev/null 2>&1 || true
+        systemctl kill -s HUP nft-miner-payments-worker.service >/dev/null 2>&1 || true
+    endscript
+}
