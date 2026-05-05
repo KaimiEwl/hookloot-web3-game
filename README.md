@@ -7,7 +7,8 @@ A game/product prototype that combines gameplay, tasks, wallet flows, backend AP
 ## Demo
 
 - GitHub: https://github.com/KaimiEwl/hookloot-web3-game
-- Live demo: https://KaimiEwl.github.io/hookloot-web3-game/
+- Live NFT Miner deployment: https://dev.freen8n.space/
+- Related playable fishing game: https://kaimiewl.github.io/fishing-game/
 - Video: planned
 - Case notes: see `docs/architecture.md`
 
