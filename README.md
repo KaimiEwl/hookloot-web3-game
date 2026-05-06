@@ -1,5 +1,7 @@
 # HookLoot Web3 Game
 
+[![Deploy to GitHub Pages](https://github.com/KaimiEwl/hookloot-web3-game/actions/workflows/pages.yml/badge.svg)](https://github.com/KaimiEwl/hookloot-web3-game/actions/workflows/pages.yml)
+
 ![Project preview](docs/screenshots/preview.png)
 
 A game/product prototype that combines gameplay, tasks, wallet flows, backend APIs and monetization experiments.
